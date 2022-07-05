@@ -1,0 +1,5 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+# Anonimize local WiFi credentials
+*.ino filter=SSID-anon
+*.ino filter=PASS-anon
