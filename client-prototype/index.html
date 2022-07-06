@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambient light client prototype</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="utils.js"></script>
+    <script src="script.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+
+        label {
+            display: block;
+            margin: 1em 0 0 0;
+        }
+
+        hr {
+            width: 20em;
+            margin-left: 0;
+        }
+    </style>
+</head>
+<body>
+    <label for="left_brightness">left brightness:</label>
+    <input type="range" name="left_brightness" id="left_brightness" min="0" max="255" step="1" onchange="setLeftBrightness()">
+    <span id="left_brightness_value"></span>
+    <label for="right_brightness">right brightness:</label>
+    <input type="range" name="right_brightness" id="right_brightness" min="0" max="255" step="1" onchange="setRightBrightness()">
+    <span id="right_brightness_value"></span>
+    <hr>
+    <input type="submit" id="power_on" value="on" onclick="return powerOn()">    
+    <input type="submit" id="power_off" value="off" onclick="return powerOff()">
+    <hr>
+    <label for="power_on_hour">power on hour:</label>
+    <input type="checkbox" name="power_on_hour_flag" id="power_on_hour_flag" onchange="enablePowerOnHour()">
+    <input type="range" name="power_on_hour" id="power_on_hour" min="0" max="24" step="1" onchange="setPowerOnHour()">
+    <span id="power_on_hour_value"></span>
+    <hr>
+    <input type="button" value="Save" onclick="return save()">
+</body>
+</html>
