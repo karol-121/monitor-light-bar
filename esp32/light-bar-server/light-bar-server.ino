@@ -5,15 +5,20 @@
 #define NETWORK_SSID "WiFi-SSID"
 #define NETWORK_PASSWORD "WiFi-PASSWORD"
 
-//change the variable names afterwards as they will not correspond to diodes in final product
-#define LEFT_LEDSTRIP_OUTPUT 32
-#define RIGHT_LEDSTRIP_OUTPUT 33
+//pin output for leds, each led strip has warm and cold leds
+#define _LEFT_WARM 13 
+#define _LEFT_COLD 27
+#define _RIGHT_WARM 33
+#define _RIGHT_COLD 32
 
 WiFiServer server(80);
 
 //brightness levels:
-int left_brightness_level;
-int right_brightness_level;
+int left_warm_level;
+int left_cold_level;
+
+int right_warm_level;
+int right_cold_level;
 
 //power, on/off
 bool power;
@@ -33,8 +38,15 @@ void response(WiFiClient client, int type) {
 }
 
 void setup(){
-  pinMode(LEFT_LEDSTRIP_OUTPUT, OUTPUT);
-  pinMode(RIGHT_LEDSTRIP_OUTPUT, OUTPUT);
+  pinMode(_LEFT_WARM, OUTPUT);
+  pinMode(_LEFT_COLD, OUTPUT);
+  pinMode(_RIGHT_WARM, OUTPUT);
+  pinMode(_RIGHT_COLD, OUTPUT);
+
+//  analogWriteResolution(_LEFT_WARM, 12);
+//  analogWriteResolution(_LEFT_COLD, 12);
+//  analogWriteResolution(_RIGHT_WARM, 12);
+//  analogWriteResolution(_LEFT_COLD, 12);
   
   Serial.begin(115200);
   delay(10);
@@ -45,8 +57,11 @@ void setup(){
   server.begin();
 
   //set level to maximum each time the controller is powered on
-  left_brightness_level = 255;
-  right_brightness_level = 255;
+  left_warm_level = 255;
+  left_cold_level = 255;
+  
+  right_warm_level = 255;
+  right_cold_level = 255;
 
   //start with leds turned on
   power = true;
@@ -55,11 +70,15 @@ void setup(){
 void loop() {
 
   if (power) {
-    analogWrite (LEFT_LEDSTRIP_OUTPUT, left_brightness_level);
-    analogWrite (RIGHT_LEDSTRIP_OUTPUT, right_brightness_level);
+    analogWrite (_LEFT_WARM, left_warm_level);
+    analogWrite (_LEFT_COLD, left_cold_level);
+    analogWrite (_RIGHT_WARM, right_warm_level);
+    analogWrite (_RIGHT_COLD, right_cold_level);
   } else {
-    analogWrite (LEFT_LEDSTRIP_OUTPUT, 0);
-    analogWrite (RIGHT_LEDSTRIP_OUTPUT, 0);
+    analogWrite (_LEFT_WARM, 0);
+    analogWrite (_LEFT_COLD, 0);
+    analogWrite (_RIGHT_WARM, 0);
+    analogWrite (_RIGHT_COLD, 0);
   }
   
   
@@ -87,21 +106,29 @@ void loop() {
       client.println();
       client.print("{\"power\": \"");
       client.print(power);
-      client.print("\",\"left\": \"");
-      client.print(left_brightness_level);
-      client.print("\",\"right\": \"");
-      client.print(right_brightness_level);
+      client.print("\",\"left warm\": \"");
+      client.print(left_warm_level);
+      client.print("\",\"left cold\": \"");
+      client.print(left_cold_level);
+      client.print("\",\"right warm\": \"");
+      client.print(right_warm_level);
+      client.print("\",\"right cold\": \"");
+      client.print(right_cold_level);
       client.print("\"}");
       client.println();
       
     } else if (HTTPrequestStartLine.startsWith("GET /brightness")) { //if the request was to set brightness
 
-      //get left brightness level from http request
-      left_brightness_level = HTTPrequestStartLine.substring(21,24).toInt();
+      //GET /brightness?left_cold=xxx&left_warm=xxx&right_cold=xxx&right_warm=xxx
 
-      //get right brightness level form http request
-      right_brightness_level = HTTPrequestStartLine.substring(31,34).toInt();
+      //get left brightness level from http request
+      left_warm_level = HTTPrequestStartLine.substring(26,29).toInt();
+      left_cold_level = HTTPrequestStartLine.substring(40,43).toInt();
       
+      //get right brightness level form http request
+      right_warm_level = HTTPrequestStartLine.substring(55,58).toInt();
+      right_cold_level = HTTPrequestStartLine.substring(70,73).toInt();
+
       response(client, 0);
 
     } else if (HTTPrequestStartLine.startsWith("GET /?power=1")) { //if the request was to turn on the power
